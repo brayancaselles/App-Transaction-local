@@ -1,0 +1,36 @@
+<resources>
+    <!--region App general data-->
+    <string name="app_name">AppCrediBanCo</string>
+    <string name="app_name_text">CrediBanCo</string>
+    <string name="bottom_menu_transaction_list">Transacciones</string>
+    <string name="bottom_menu_search">Buscar</string>
+    <string name="bottom_menu_create_transaction">Crear Transaccion</string>
+    <!--endregion-->
+    <!--region Transaction authorization-->
+    <string name="transaction_authorization_text_commerce_code">Código del comercio</string>
+    <string name="transaction_authorization_text_terminal_code">Número de terminal</string>
+    <string name="transaction_authorization_text_amount">Valor total a pagar</string>
+    <string name="transaction_authorization_text_card">Número de tarjeta</string>
+    <string name="transaction_authorization_text_button">Aprobar transacción</string>
+    <string name="transaction_authorization_text_validate_commerce_code">Debe ingresar al menos 6 caracteres</string>
+    <string name="transaction_authorization_text_validate_terminal_code">Debe ingresar al menos 6 caracteres</string>
+    <string name="transaction_authorization_text_validate_amount">Debe ingresar al menos 2 caracteres</string>
+    <string name="transaction_authorization_text_validate_card">Debe ingresar al menos 16 caracteres</string>
+    <string name="transaction_authorization_text_title_dialog">¡Atención!</string>
+    <string name="transaction_authorization_text_title_error_dialog">¡Error!</string>
+    <string name="transaction_authorization_text_success_transaction">Transacción aprobada con éxito.</string>
+    <string name="transaction_authorization_text_failure_transaction">Código de comercio o número de terminal incorrecto, verifica los datos.</string>
+    <!--endregion-->
+    <!--region Transaction list-->
+    <string name="transaction_list_text_no_transaction_list">No hay transacciones disponibles en este momento.</string>
+    <string name="transaction_list_text_title_detail">Detalle transacción</string>
+    <string name="transaction_list_text_receipt_number">Número de recibo: %s</string>
+    <string name="transaction_list_text_identifier">Id transacción: %s</string>
+    <string name="transaction_list_text_status_code">Código de estado: %s</string>
+    <string name="transaction_list_text_description">Descripción estado: </string>
+    <!--endregion-->
+    <!--region search transaction-->
+    <string name="transaction_search_transaction_text_seacrch">Ingrese el número de recibo</string>
+    <string name="transaction_authorization_text_button_text_cancel_transaction">Anular transacción</string>
+    <!--endregion-->
+</resources>

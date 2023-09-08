@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/transactionListFragment2">
+
+    <fragment
+        android:id="@+id/transactionListFragment2"
+        android:name="com.example.appcredibanco.ui.transactionList.TransactionListFragment"
+        android:label="fragment_transaction_list"
+        tools:layout="@layout/fragment_transaction_list" />
+    <fragment
+        android:id="@+id/searchTransactionFragment"
+        android:name="com.example.appcredibanco.ui.searchTransaction.SearchTransactionFragment"
+        android:label="fragment_search_transaction"
+        tools:layout="@layout/fragment_search_transaction" >
+        <action
+            android:id="@+id/action_searchTransactionFragment_to_transactionDetailDialogFragment2"
+            app:destination="@id/transactionDetailDialogFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/transactionAuthorizationFragment2"
+        android:name="com.example.appcredibanco.ui.transactionAutorization.TransactionAuthorizationFragment"
+        android:label="fragment_transaction_authorization"
+        tools:layout="@layout/fragment_transaction_authorization" />
+    <dialog
+        android:id="@+id/transactionDetailDialogFragment"
+        android:name="com.example.appcredibanco.ui.transactionDetail.TransactionDetailDialogFragment"
+        android:label="fragment_transaction_detail_dialog"
+        tools:layout="@layout/fragment_transaction_detail_dialog" >
+        <!--<argument
+            android:name="receiptNumber"
+            app:argType="string" />
+        <argument
+            android:name="transactionIdentifier"
+            app:argType="string" />
+        <argument android:name="statusCode"
+            app:argType="string" />
+        <argument
+            android:name="statusDescription"
+            app:argType="string" />-->
+    </dialog>
+</navigation>
