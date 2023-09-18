@@ -11,12 +11,12 @@
         android:id="@+id/edit_text_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:backgroundTint="@color/primary_dark"
         android:hint="@string/transaction_search_transaction_text_seacrch"
         android:imeOptions="actionDone"
         android:maxLines="1"
         android:singleLine="true"
-        android:layout_margin="6dp"
-        android:backgroundTint="@color/primary_dark"
         android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,6 +32,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_text_filter"
         tools:listitem="@layout/item_search_transaction" />
+
+    <TextView
+        android:id="@+id/text_view_no_list_transaction"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/transaction_list_text_no_transaction_list"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
 
     <ViewStub
         android:id="@+id/view_stub_custom_loading"

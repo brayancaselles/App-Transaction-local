@@ -9,6 +9,8 @@ import com.example.appcredibanco.domain.model.AnnulationTransactionModel
 import com.example.appcredibanco.domain.model.Transaction
 import com.example.appcredibanco.domain.model.TransactionModel
 import com.example.appcredibanco.domain.model.toDomain
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class TransactionRepository @Inject constructor(
@@ -33,9 +35,9 @@ class TransactionRepository @Inject constructor(
         transactionDao.insertTransaction(transactions)
     }
 
-    suspend fun getAllTransactionFromDataBase(): List<Transaction> {
+    suspend fun getAllTransactionFromDataBase(): Flow<List<Transaction>> = flow {
         val response = transactionDao.getAllTransaction()
-        return response.map { it.toDomain() }
+        emit(response.map { it.toDomain() })
     }
 
     suspend fun requestAnnulationTransaction(

@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -12,29 +13,25 @@ import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.example.appcredibanco.R
 import com.example.appcredibanco.common.util.EnumResponseService
 import com.example.appcredibanco.databinding.FragmentTransactionDetailDialogBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class TransactionDetailDialogFragment() :
-    DialogFragment() {
+class TransactionDetailDialogFragment(
+    private val idTransaction: Int,
+    private val receiptNumber: String,
+    private val transactionIdentifier: String,
+    private val statusCode: String,
+    private val statusDescription: String,
+    private val isDeleteTransaction: (Boolean) -> Unit,
+) : DialogFragment() {
 
     private var _binding: FragmentTransactionDetailDialogBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: TransactionDetailDialogViewModel by viewModels()
-
-    private var idTransaction: Int? = null
-    private lateinit var receiptNumber: String
-    private lateinit var transactionIdentifier: String
-    private lateinit var statusCode: String
-    private lateinit var statusDescription: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,15 +40,6 @@ class TransactionDetailDialogFragment() :
     ): View {
         _binding = FragmentTransactionDetailDialogBinding.inflate(inflater, container, false)
         isCancelable = false
-        binding.apply {
-            arguments?.let { bundle ->
-                idTransaction = bundle.getInt("id")
-                receiptNumber = bundle.getString("receipt_number").toString()
-                transactionIdentifier = bundle.getString("transaction_identifier").toString()
-                statusCode = bundle.getString("status_code").toString()
-                statusDescription = bundle.getString("status_description").toString()
-            }
-        }
         return binding.root
     }
 
@@ -73,57 +61,92 @@ class TransactionDetailDialogFragment() :
 
     private fun initDataText() {
         binding.apply {
-            textViewReceiptNumber.text = receiptNumber
-            textViewTransactionIdentifier.text = transactionIdentifier
-            textViewStatusCode.text = statusCode
+            textViewReceiptNumber.text =
+                getString(R.string.transaction_list_text_receipt_number, receiptNumber)
+            textViewTransactionIdentifier.text = getString(
+                R.string.transaction_list_text_identifier,
+                transactionIdentifier,
+            )
+            textViewStatusCode.text = getString(
+                R.string.transaction_list_text_status_code,
+                statusCode,
+            )
             textViewStatusDescription.text = statusDescription
+
             imageButtonCancel.setOnClickListener { dismiss() }
             buttonVoidTransaction.setOnClickListener {
-                showLoading(true)
-                idTransaction?.let { id ->
-                    viewModel.onDataSelected(
-                        idTransaction = id,
-                        receiptNumber = receiptNumber,
-                        transactionIdentifier = transactionIdentifier,
-                    )
-                }
+                showMessageDialogWarning(
+                    R.string.transaction_authorization_text_title_dialog,
+                    getString(R.string.transaction_annulation_text_success_annulation_warning),
+                )
             }
         }
     }
 
     private fun annulationTransaction() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.showDialog.collect { event ->
+        viewModel.showDialog.observe(viewLifecycleOwner) {
+            when (it) {
+                EnumResponseService.IS_SUCCESS -> {
                     showLoading(false)
-                    event.enum?.let { showDialog(it) }
+                    isDeleteTransaction(true)
+                    showMessageDialog(
+                        R.string.transaction_authorization_text_title_dialog,
+                        getString(R.string.transaction_annulation_text_success_annulation),
+                    )
+                }
+
+                EnumResponseService.IS_FAILURE -> {
+                    showLoading(false)
+                    isDeleteTransaction(false)
+                    showMessageDialog(
+                        R.string.transaction_authorization_text_title_error_dialog,
+                        getString(
+                            R.string.transaction_list_text_error,
+                        ),
+                    )
+                }
+
+                EnumResponseService.IS_DEFAULT -> {
+                    isDeleteTransaction(false)
+                    Log.d("ISDEFAULT", "is default value enum")
                 }
             }
         }
     }
 
-    private fun showDialog(enum: EnumResponseService) {
-        when (enum) {
-            EnumResponseService.IS_SUCCESS -> showMessageDialog(
-                R.string.transaction_authorization_text_title_dialog,
-                R.string.transaction_authorization_text_success_transaction,
-            )
-
-            EnumResponseService.IS_FAILURE, EnumResponseService.IS_DEFAULT -> showMessageDialog(
-                R.string.transaction_authorization_text_title_error_dialog,
-                R.string.transaction_authorization_text_failure_transaction,
-            )
-        }
-    }
-
     private fun showMessageDialog(
         title: Int,
-        message: Int,
+        message: String,
     ) {
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle(getString(title))
-            .setMessage(getString(message))
+            .setMessage(message)
             .setPositiveButton(android.R.string.ok) { view, _ ->
+                view.dismiss()
+                dismiss()
+            }
+            .setCancelable(false)
+            .create()
+        dialog.show()
+    }
+
+    private fun showMessageDialogWarning(
+        title: Int,
+        message: String,
+    ) {
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(getString(title))
+            .setMessage(message)
+            .setPositiveButton(android.R.string.ok) { view, _ ->
+                showLoading(true)
+                viewModel.onDataSelected(
+                    idTransaction = idTransaction,
+                    receiptNumber = receiptNumber,
+                    transactionIdentifier = transactionIdentifier,
+                )
+                view.dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel) { view, _ ->
                 view.dismiss()
             }
             .setCancelable(false)

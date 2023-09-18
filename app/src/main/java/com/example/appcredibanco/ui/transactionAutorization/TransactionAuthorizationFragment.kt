@@ -8,8 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -51,6 +51,52 @@ class TransactionAuthorizationFragment : Fragment() {
             editTextCard.loseFocusAfterAction(EditorInfo.IME_ACTION_DONE)
             editTextCard.setOnFocusChangeListener { _, hasFocus -> onFieldChanged(hasFocus) }
             editTextCard.onTextChanged { onFieldChanged() }
+
+            buttonAuthorize.setOnClickListener {
+                it.dismissKeyboard()
+                if (validateIsNotEmptyText()) {
+                    viewModel.onDataSelected(
+                        editTextCommerceCode.text.toString(),
+                        editTextTerminalCode.text.toString(),
+                        editTextAmount.text.toString(),
+                        editTextCard.text.toString(),
+                    )
+                } else {
+                    Toast.makeText(
+                        context,
+                        getString(R.string.transaction_annulation_valdiate_text),
+                        Toast.LENGTH_LONG,
+                    ).show()
+                }
+            }
+        }
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewFieldsState.collect {
+                    updateUI(it)
+                }
+            }
+        }
+        viewModel.showDialog.observe(viewLifecycleOwner) {
+            showDialog(it)
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.showLoading.collect { event ->
+                    event.showLoading?.let { showLoading(it) }
+                }
+            }
+        }
+        initTextChange()
+    }
+
+    private fun initTextChange() {
+        binding.apply {
             editTextAmount.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
                     s: CharSequence?,
@@ -61,7 +107,7 @@ class TransactionAuthorizationFragment : Fragment() {
                 }
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    if (s.toString() != current) {
+                    if (s.toString().isNotEmpty() && s.toString() != current) {
                         editTextAmount.removeTextChangedListener(this)
 
                         val cleanString: String = s!!.replace("""[$,.]""".toRegex(), "")
@@ -77,45 +123,8 @@ class TransactionAuthorizationFragment : Fragment() {
                     }
                 }
 
-                override fun afterTextChanged(s: Editable?) {
-                }
+                override fun afterTextChanged(s: Editable?) {}
             })
-
-            buttonAuthorize.setOnClickListener {
-                it.dismissKeyboard()
-                viewModel.onDataSelected(
-                    editTextCommerceCode.text.toString(),
-                    editTextTerminalCode.text.toString(),
-                    editTextAmount.text.toString(),
-                    editTextCard.text.toString(),
-                )
-            }
-        }
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.viewState.collect {
-                    updateUI(it)
-                }
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.showDialog.collect { event ->
-                    event.enum?.let { showDialog(it) }
-                }
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.showLoading.collect { event ->
-                    event.showLoading?.let { showLoading(it) }
-                }
-            }
         }
     }
 
@@ -150,12 +159,7 @@ class TransactionAuthorizationFragment : Fragment() {
                     R.string.transaction_authorization_text_title_dialog,
                     R.string.transaction_authorization_text_success_transaction,
                 )
-                /*binding.apply {
-                    editTextCommerceCode.text?.let { it.clear() }
-                    editTextTerminalCode.text?.let { it.clear() }
-                    editTextAmount.text?.let { it.clear() }
-                    editTextCard.text?.let { it.clear() }
-                }*/
+                clearText()
             }
 
             EnumResponseService.IS_FAILURE, EnumResponseService.IS_DEFAULT -> showMessageDialog(
@@ -169,18 +173,36 @@ class TransactionAuthorizationFragment : Fragment() {
         title: Int,
         message: Int,
     ) {
-        val dialog = AlertDialog.Builder(requireContext())
-            .setTitle(getString(title))
-            .setMessage(getString(message))
-            .setPositiveButton(android.R.string.ok) { view, _ ->
-                view.dismiss()
-            }
-            .setCancelable(false)
-            .create()
-        dialog.show()
+        if (validateIsNotEmptyText()) {
+            val dialog = AlertDialog.Builder(requireContext())
+                .setTitle(getString(title))
+                .setMessage(getString(message))
+                .setPositiveButton(android.R.string.ok) { view, _ ->
+                    view.dismiss()
+                }
+                .setCancelable(false)
+                .create()
+            dialog.show()
+        }
     }
 
     private fun showLoading(show: Boolean) {
         binding.progressBar.isVisible = show
+    }
+
+    private fun validateIsNotEmptyText(): Boolean {
+        return binding.editTextCommerceCode.text!!.isNotEmpty() &&
+            binding.editTextTerminalCode.text!!.isNotEmpty() &&
+            binding.editTextAmount.text!!.isNotEmpty() &&
+            binding.editTextCard.text!!.isNotEmpty()
+    }
+
+    private fun clearText() {
+        binding.apply {
+            editTextCommerceCode.text?.clear()
+            editTextTerminalCode.text?.clear()
+            editTextAmount.text?.clear()
+            editTextCard.text?.clear()
+        }
     }
 }

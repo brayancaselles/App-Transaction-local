@@ -1,13 +1,12 @@
 package com.example.appcredibanco.ui.transactionDetail
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.appcredibanco.common.util.EnumResponseService
 import com.example.appcredibanco.domain.AnnulationTransactionUserCase
-import com.example.appcredibanco.ui.transactionAutorization.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,8 +14,8 @@ import javax.inject.Inject
 class TransactionDetailDialogViewModel @Inject constructor(private val annulationTransactionUseCase: AnnulationTransactionUserCase) :
     ViewModel() {
 
-    private val _showDialog: MutableStateFlow<Event> by lazy { MutableStateFlow(Event()) }
-    val showDialog: StateFlow<Event> get() = _showDialog
+    private val _showDialog = MutableLiveData<EnumResponseService>()
+    val showDialog: LiveData<EnumResponseService> = _showDialog
 
     fun onDataSelected(
         idTransaction: Int,
@@ -24,16 +23,13 @@ class TransactionDetailDialogViewModel @Inject constructor(private val annulatio
         transactionIdentifier: String,
     ) {
         viewModelScope.launch {
-            val enum = annulationTransactionUseCase.annulationTransaction(
-                idTransaction,
-                receiptNumber,
-                transactionIdentifier,
+            _showDialog.postValue(
+                annulationTransactionUseCase.annulationTransaction(
+                    idTransaction,
+                    receiptNumber,
+                    transactionIdentifier,
+                ),
             )
-            _showDialog.update { currenstate ->
-                currenstate.copy(
-                    enum = enum,
-                )
-            }
         }
     }
 }

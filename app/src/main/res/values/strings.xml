@@ -28,9 +28,16 @@
     <string name="transaction_list_text_identifier">Id transacción: %s</string>
     <string name="transaction_list_text_status_code">Código de estado: %s</string>
     <string name="transaction_list_text_description">Descripción estado: </string>
+    <string name="transaction_list_text_error">Ha ocurrido un error, inténtelo de nuevo más tarde.</string>
     <!--endregion-->
     <!--region search transaction-->
     <string name="transaction_search_transaction_text_seacrch">Ingrese el número de recibo</string>
     <string name="transaction_authorization_text_button_text_cancel_transaction">Anular transacción</string>
+    <!--endregion-->
+    <!--region Annulation transaction-->
+    <string name="transaction_annulation_text_general_error">Error: %s</string>
+    <string name="transaction_annulation_text_success_annulation">Transacción anulada con éxito.</string>
+    <string name="transaction_annulation_text_success_annulation_warning">Estas seguro de eliminar la transacción.</string>
+    <string name="transaction_annulation_valdiate_text">Completa la información.</string>
     <!--endregion-->
 </resources>

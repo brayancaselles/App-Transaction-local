@@ -29,16 +29,20 @@
         android:name="com.example.appcredibanco.ui.transactionDetail.TransactionDetailDialogFragment"
         android:label="fragment_transaction_detail_dialog"
         tools:layout="@layout/fragment_transaction_detail_dialog" >
-        <!--<argument
+        <argument
+            android:name="id"
+            app:argType="integer" />
+        <argument
             android:name="receiptNumber"
             app:argType="string" />
         <argument
             android:name="transactionIdentifier"
             app:argType="string" />
-        <argument android:name="statusCode"
+        <argument
+            android:name="statusCode"
             app:argType="string" />
         <argument
             android:name="statusDescription"
-            app:argType="string" />-->
+            app:argType="string" />
     </dialog>
 </navigation>

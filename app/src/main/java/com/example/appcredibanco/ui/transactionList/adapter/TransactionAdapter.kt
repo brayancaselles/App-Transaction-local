@@ -8,7 +8,7 @@ import com.example.appcredibanco.domain.model.Transaction
 
 class TransactionAdapter() : RecyclerView.Adapter<TransactionViewHolder>() {
 
-    private lateinit var transactionList: List<Transaction>
+    private var transactionList: List<Transaction> = listOf()
 
     fun updateList(list: List<Transaction>) {
         transactionList = list

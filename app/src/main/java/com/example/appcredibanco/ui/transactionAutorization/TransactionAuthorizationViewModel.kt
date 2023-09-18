@@ -1,5 +1,7 @@
 package com.example.appcredibanco.ui.transactionAutorization
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appcredibanco.common.util.EnumResponseService
@@ -12,7 +14,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class Event(var enum: EnumResponseService? = null)
 data class Loading(var showLoading: Boolean? = null)
 
 @HiltViewModel
@@ -24,17 +25,17 @@ class TransactionAuthorizationViewModel @Inject constructor(private val createTr
         const val MAX_CHARS_LENGTH = 16
     }
 
-    private val _viewState = MutableStateFlow(TransactionViewState())
-    val viewState: StateFlow<TransactionViewState> get() = _viewState
+    private val _viewFieldsState = MutableStateFlow(TransactionViewState())
+    val viewFieldsState: StateFlow<TransactionViewState> get() = _viewFieldsState
 
-    private val _showDialog: MutableStateFlow<Event> by lazy { MutableStateFlow(Event()) }
-    val showDialog: StateFlow<Event> get() = _showDialog
+    private val _showDialog = MutableLiveData<EnumResponseService>()
+    val showDialog: LiveData<EnumResponseService> get() = _showDialog
 
     private val _showLoading: MutableStateFlow<Loading> by lazy { MutableStateFlow(Loading()) }
     val showLoading: StateFlow<Loading> get() = _showLoading
 
     fun onFieldsChanged(commerceCode: String, terminalCode: String, amount: String, card: String) {
-        _viewState.value = TransactionViewState(
+        _viewFieldsState.value = TransactionViewState(
             isValidCommerceCode = isValidForSixChars(commerceCode),
             isValidTerminalCode = isValidForSixChars(terminalCode),
             isValidAmount = isValidForTwoChars(amount),
@@ -77,12 +78,14 @@ class TransactionAuthorizationViewModel @Inject constructor(private val createTr
             _showLoading.update { currentState ->
                 currentState.copy(showLoading = true)
             }
-            val enum = createTransactionUseCase.create(commerceCode, terminalCode, amount, card)
-            _showDialog.update { currentState ->
-                currentState.copy(
-                    enum = enum,
-                )
-            }
+            _showDialog.postValue(
+                createTransactionUseCase.create(
+                    commerceCode,
+                    terminalCode,
+                    amount,
+                    card,
+                ),
+            )
             _showLoading.update { currentState ->
                 currentState.copy(showLoading = false)
             }

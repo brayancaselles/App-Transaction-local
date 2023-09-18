@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -55,7 +56,7 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-    val navVersion = "2.7.1"
+    val navVersion = "2.7.0"
     val hiltVersion = "2.48" // 2.44
     val roomVersion = "2.5.2" // 2.4.2
     val retrofitVersion = "2.9.0"
@@ -88,4 +89,9 @@ dependencies {
     // LiveData
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+
+    // Unit Testing
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.kotlintest:kotlintest-runner-junit5:3.4.2")
+    testImplementation("io.mockk:mockk:1.12.3")
 }
